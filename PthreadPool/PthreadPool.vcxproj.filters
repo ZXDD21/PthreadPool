@@ -18,8 +18,16 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="my_thread.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="my_unique_ptr.h">
+      <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="my_threadpool.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="my_shared_ptr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

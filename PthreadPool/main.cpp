@@ -1,64 +1,46 @@
-/*#include <iostream>
-#include <mutex>
-#include <thread>
-#include <list>
-#include <condition_variable>
-const int MaxTaskCount = 200;//任务队列上限
-template<class T>
-class SyncQueue {
+#include "my_unique_ptr.h"
+#include "my_threadpool.h"
+#include "my_shared_ptr.h"
+using namespace std;
+class Int {
 private:
-	std::list<T>m_queue;//队列
-	std::mutex m_mutex;//互斥访问队列
-	std::condition_variable m_notEmpty;//条件变量，消费者
-	std::condition_variable m_notFull;//生产者
-	int m_maxSize;
-	bool m_needStop;//false running//true stop
-	bool IsFull()const {
-		bool full = m_queue.size() >= m_maxSize;
-		if (full) {
-			cout << "m_queue 满，添加任务需要等待。" << endl;
-		}
-		return full;
-	}
-	bool IsEmpty()const {
-		bool empty = m_queue.empty();
-		if (empty) {
-			cout << "m_queue 空，获取任务需要等待。" << endl;
-		}
-		return empty;
-	}
-	template<class F>
-	void Add(F&& task) {
-		std::unique_lock<std::mutex>locker(m_mutex);
-		while (!m_needStop&&IsFull()) {
-			m_notFull.wait(locker);//1.弃锁，2.增加到条件变量的等待队列，3.唤醒，4.获锁
-		}
-		if (m_needStop) {
-			return;
-		}
-		m_queue.push_back(std::forward<F>(task));
-		m_notEmpty.notify_one();
-	}
+	int data;
 public:
-	SynQueue(int maxSize = MaxTaskCount) :m_MaxSize(maxSize), m_needStop(false) {
-	
+	explicit Int(int x = 0) :data(x) {};//明确关键字，不允许重载
+	~Int() { cout << "delete" << endl; };
+	void Print()const {
+		cout << data << endl;
 	}
-	~SyncQueue() {
+};
+void func() {
+	my_shared_ptr<Int>pa(new Int(5));
+	my_shared_ptr<Int>pb(new Int(5));
+	my_shared_ptr<Int>pc=pb;
+	my_shared_ptr<Int>pd=std::move(pb);
+	pa->Print();
+	//pb->Print();
+	pc->Print();
+	pd->Print();
+	{
+		my_shared_ptr<Int>pe(pd);
+		pc->Print();
+	}
+	//pb->Print();
+}
+int main() {
+	func();
+	return 0;
+}
 
-	}
-	SyncQueue(const SyncQueue&) = delete;//禁止拷贝构造
-	SyncQueue& operator=(const SyncQueue&) = delete;
-	void Put(const T& tast) {
-		Add(task);
-	}
-	void Put(T&& task) {
-		Add(std::forward<T>(task));
-	}
-	void Take(std::list<T>& tlist);
-	void Take(T& task);
-	void Stop();
-	bool Empty()const;
-	bool Full()const;
-	size_t Size()const;
-	size_t Count()const;
-};*/
+/*int main() {
+	//my_unique_ptr<int>ptr(new int);
+	//my_unique_ptr<int[]>par(new int[10]);
+	Int a(10);
+	//Int b = 20;
+	Int c{ 30 };
+	Int d;
+	std::unique_ptr<Int>pa(new Int(10));
+	//std::unique_ptr<Int>pb = new Int(10);
+	std::unique_ptr<Int>pc = std::make_unique <Int>(20);
+	return 0;
+}*/
